@@ -4,6 +4,9 @@
     <ClCompile Include="C:\V's Dev\irisTracker\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\V's Dev\irisTracker\src\myTwoStepInferencer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\V's Dev\irisTracker\CMakeLists.txt" />

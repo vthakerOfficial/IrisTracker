@@ -1,3 +1,6 @@
+# custom ignore rules
+/build/
+
 # Prerequisites
 *.d
 

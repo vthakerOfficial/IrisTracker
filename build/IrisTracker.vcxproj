@@ -86,6 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/V's Dev/opencv/build/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -107,16 +108,28 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_ffmpeg4110_64.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_msmf4110_64.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_msmf4110_64d.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_world4110.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_world4110d.dll" "C:/V's Dev/irisTracker/build/Debug"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
     <Link>
       <AdditionalDependencies>C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -133,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/V's Dev/opencv/build/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -155,16 +169,28 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_ffmpeg4110_64.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_msmf4110_64.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_msmf4110_64d.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_world4110.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_world4110d.dll" "C:/V's Dev/irisTracker/build/Release"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
     <Link>
       <AdditionalDependencies>C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -181,6 +207,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/V's Dev/opencv/build/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -203,16 +230,28 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_ffmpeg4110_64.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_msmf4110_64.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_msmf4110_64d.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_world4110.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_world4110d.dll" "C:/V's Dev/irisTracker/build/MinSizeRel"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
     <Link>
       <AdditionalDependencies>C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -229,6 +268,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/V's Dev/opencv/build/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -250,16 +290,28 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\V's Dev\irisTracker\include;C:\V's Dev\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_ffmpeg4110_64.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_msmf4110_64.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_videoio_msmf4110_64d.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_world4110.dll" "C:/V's Dev/opencv/build/x64/vc16/bin/opencv_world4110d.dll" "C:/V's Dev/irisTracker/build/RelWithDebInfo"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
     <Link>
       <AdditionalDependencies>C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;C:\V's Dev\opencv\build\x64\vc16\lib\opencv_world4110.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -333,6 +385,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\V's Dev\irisTracker\src\main.cpp" />
+    <ClCompile Include="C:\V's Dev\irisTracker\src\myTwoStepInferencer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\V's Dev\irisTracker\build\ZERO_CHECK.vcxproj">

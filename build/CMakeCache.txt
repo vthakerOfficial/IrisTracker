@@ -197,12 +197,6 @@ IrisTracker_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 IrisTracker_SOURCE_DIR:STATIC=C:/V's Dev/irisTracker
 
-//The directory containing a CMake configuration file for OPENCV.
-OPENCV_DIR:PATH=OPENCV_DIR-NOTFOUND
-
-//The directory containing a CMake configuration file for OpenCV.
-OpenCV_DIR:PATH=OpenCV_DIR-NOTFOUND
-
 
 ########################
 # INTERNAL cache entries

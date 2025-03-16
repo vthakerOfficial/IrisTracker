@@ -3,8 +3,16 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "C:/V's Dev/opencv/build/include"
             ],
+            "browse": {
+                "path": [
+                    "$(workspaceFolder)",
+                    "C:/V's Dev/opencv/build/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            },
             "defines": [
                 "_DEBUG",
                 "UNICODE",
