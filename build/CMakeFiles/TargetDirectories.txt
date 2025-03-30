@@ -1,3 +1,0 @@
-C:/V's Dev/irisTracker/build/CMakeFiles/IrisTracker.dir
-C:/V's Dev/irisTracker/build/CMakeFiles/ALL_BUILD.dir
-C:/V's Dev/irisTracker/build/CMakeFiles/ZERO_CHECK.dir

@@ -4,14 +4,16 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/V's Dev/opencv/build/include"
+                "C:/V_Dev/dependencies/opencv/build/include",
+                "C:/V_Dev/dependencies/onnxruntime/onnxruntime-win-x64-gpu-1.21.0/include"
             ],
             "browse": {
                 "path": [
                     "$(workspaceFolder)",
-                    "C:/V's Dev/opencv/build/include"
+                    "C:/V_Dev/dependencies/opencv/build/include",
+                    "C:/V_Dev/dependencies/onnxruntime/onnxruntime-win-x64-gpu-1.21.0/include"
                 ],
-                "limitSymbolsToIncludedHeaders": true
+                "limitSymbolsToIncludedHeaders": false
             },
             "defines": [
                 "_DEBUG",
