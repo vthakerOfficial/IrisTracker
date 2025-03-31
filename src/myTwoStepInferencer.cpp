@@ -53,10 +53,23 @@ private:
 
     float confThres;
 public:
-    Inferencer(const wstring& modelPath, float confidence = .3f) 
+    Inferencer(const wstring& modelPath, float confidence = .3f, bool bGPUBased = true) 
      : env(ORT_LOGGING_LEVEL_WARNING, "onnxruntimeEnv"),
-          session(env, modelPath.c_str(), Ort::SessionOptions()),
-          confThres(confidence)
+       confThres(confidence),
+       session(
+        env,
+        modelPath.c_str(),
+        [bGPUBased]() -> Ort::SessionOptions {
+            Ort::SessionOptions sessionOptions;
+            if (bGPUBased) {
+                sessionOptions.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
+                OrtCUDAProviderOptions cudaOptions;
+                cudaOptions.device_id = 0;
+                sessionOptions.AppendExecutionProvider_CUDA(cudaOptions);
+            }
+            return sessionOptions;
+        }()
+       )
     {
         
         // setting names of model's inputs/outputs

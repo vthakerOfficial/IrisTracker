@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.28)
 project(IrisTracker)
 
 # set OpenCV directory paths
@@ -38,7 +38,7 @@ add_custom_command(
 # ALL ONNX STUFF BELOW 
 
 # set ONNX Runtime directory paths
-set(ONNXRUNTIME_DIR "C:/V_Dev/dependencies/onnxruntime/onnxruntime-win-x64-gpu-1.21.0")
+set(ONNXRUNTIME_DIR "C:/V_Dev/dependencies/onnxruntime/onnxruntime-win-x64-gpu-1.21.0(1)")
 set(ONNXRUNTIME_INCLUDE_DIR "${ONNXRUNTIME_DIR}/include")
 set(ONNXRUNTIME_LIB_DIR "${ONNXRUNTIME_DIR}/lib")
 
@@ -59,3 +59,35 @@ add_custom_command(
     ${ONNXRUNTIME_LIB_DIR} 
     $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
+
+
+# need to add cuda dlls to use onnxruntime with gpu 
+set(CUDA_BIN_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin")
+file(GLOB CUDA_DLLS "${CUDA_BIN_DIR}/*.dll")
+foreach(dll ${CUDA_DLLS})
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${dll}"
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    )
+endforeach()
+# need to add CUDNN dll files also so that onnxruntime gpu works
+set(CUDNN_BIN_DIR "C:/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8")
+add_custom_command(
+    TARGET 
+    ${PROJECT_NAME} 
+    POST_BUILD 
+    COMMAND 
+    ${CMAKE_COMMAND} 
+    -E copy_directory
+    ${CUDNN_BIN_DIR} 
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>
+)
+
+
+# instructions to use gpu onnx, first get onnxruntime gpu build off of website update path above accorindgly
+# then go to https://developer.nvidia.com/cudnn, choose download cudnn library, install it, and run .exe
+# update path ^ 
+# thats it go to code and set bGPUBased = true

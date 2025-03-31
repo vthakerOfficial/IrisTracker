@@ -1,13 +1,13 @@
 #include <iostream>
-
-#include <opencv2/opencv.hpp>
 #include <onnxruntime_cxx_api.h>
 
-int noitmain() {
-    // checking opencv
-    std::cout << CV_VERSION << std::endl;
+int notmain() {
     
-    // checking onnxruntime
-    std::cout << "ONNX Runtime version: " << OrtGetApiBase()->GetVersionString() << std::endl;
+    Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "CudaTest");
+    Ort::SessionOptions sessionOptions;
+    OrtCUDAProviderOptions cudaOptions;
+    cudaOptions.device_id = 0;
+    sessionOptions.AppendExecutionProvider_CUDA(cudaOptions);
+    std::cout << "CUDA WORKS!!!!\n";
     return 0;
 }
