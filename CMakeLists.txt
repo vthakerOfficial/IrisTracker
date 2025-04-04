@@ -17,6 +17,7 @@ include_directories(${OpenCV_INCLUDE_DIR})
 set(SOURCES
     src/main.cpp
     src/myTwoStepInferencer.cpp
+    src/mouseMover.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 
@@ -91,3 +92,8 @@ add_custom_command(
 # then go to https://developer.nvidia.com/cudnn, choose download cudnn library, install it, and run .exe
 # update path ^ 
 # thats it go to code and set bGPUBased = true
+
+
+
+# allowing my headers through this cmd
+include_directories(${CMAKE_SOURCE_DIR}/src)
