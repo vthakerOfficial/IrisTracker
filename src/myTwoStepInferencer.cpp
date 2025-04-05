@@ -197,8 +197,9 @@ vector<array<float,6>> Inferencer::rmOverlappingBoxes(const vector<array<float,6
         return result;
     }
 
-cv::Mat Inferencer::twoStepInference(const cv::Mat& frame, Inferencer& modelA, Inferencer& modelB) {
-        cv::Mat resultA = modelA(frame);
+cv::Mat Inferencer::twoStepInference(const cv::Mat& frame, Inferencer& modelA, Inferencer& modelB, array<float, 4>* outDetections) {
+    int outDetectionsIndex = 0;    
+    cv::Mat resultA = modelA(frame);
         int numDetections = min(2, static_cast<int>(modelA.lastInferenceBoxes.size()));
         for (int i = 0; i < numDetections; i++) {
             auto aBox = modelA.lastInferenceBoxes[i];
@@ -239,6 +240,13 @@ cv::Mat Inferencer::twoStepInference(const cv::Mat& frame, Inferencer& modelA, I
                 int finalby1 = ay1 + origby1;
                 int finalbx2 = ax1 + origbx2;
                 int finalby2 = ay1 + origby2;
+
+                // returning midpoint coords
+                if (outDetections != nullptr) {
+                    (*outDetections)[outDetectionsIndex++] = (finalbx1 + finalbx2) / 2.0;
+                    (*outDetections)[outDetectionsIndex++] = (finalby1 + finalby2) / 2.0;
+                }
+
                 cv::rectangle(resultA, cv::Point(finalbx1, finalby1), cv::Point(finalbx2, finalby2), cv::Scalar(0, 255, 255), 4);
             }
         }
