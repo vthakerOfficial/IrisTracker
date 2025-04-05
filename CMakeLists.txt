@@ -18,6 +18,7 @@ set(SOURCES
     src/main.cpp
     src/myTwoStepInferencer.cpp
     src/mouseMover.cpp
+    src/overlayDot.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 

@@ -1,8 +1,9 @@
 #include <myTwoStepInferencer.h>
+#include <windows.h> // for overlay 
+#include <overlayDot.h>
+
 using namespace std;
 
-// aain3l
-vector<int> xVals;
 
 class PredictLook {
 public:
@@ -10,25 +11,21 @@ public:
         : eyeInferencer(m_eyePath), irisInferencer(m_irisPath)
     {}
 public:
-void run() {
+    void run() {
         cv::Mat frame = cam.getFrame();
         array<float, 4> outDetections; // in format of [x1, y1, x2, y2...]
         cv::Mat result = Inferencer::twoStepInference(frame, eyeInferencer, irisInferencer, &outDetections);
-        {
-            // aain3l
-            xVals.push_back(outDetections[0]);
-        }
-        int j =0;
-        for (int i = 0; i < outDetections.size(); i++) {
-
-            if (i % 2 != 0) {
-                cout << outDetections[i] << ")\t";
-            } else {
-                cout << ++j << ": (" << outDetections[i] << ", ";
-            }
-        }
-        cout << endl;
         cv::imshow("Result", result);
+        
+        // int j =0;
+        // for (int i = 0; i < outDetections.size(); i++) {
+        //     if (i % 2 != 0) {
+        //         cout << outDetections[i] << ")\t";
+        //     } else {
+        //         cout << ++j << ": (" << outDetections[i] << ", ";
+        //     }
+        // }
+        // cout << endl;
     }
 private:
     wstring m_eyePath = L"C:/V_Dev/irisTracker/models/eyeModel.onnx";
@@ -45,11 +42,17 @@ private:
 
 
 int main() {
+    
     PredictLook predicter;
-
     // fps
     auto t_start = chrono::high_resolution_clock::now();
     int frameCount = 0;
+
+
+
+    DotOverlay* dotOverlay = new DotOverlay();
+    dotOverlay->runDotOverlay();
+
     while (true) {
         predicter.run();
 
@@ -61,27 +64,16 @@ int main() {
             // cout << "fps: " << frameCount << endl;
             frameCount = 0;
             t_start = t_now;
+
+            // random val
+            float rand1 = rand() / (float)(RAND_MAX);
+            float rand2 = rand() / (float)(RAND_MAX);
+            dotOverlay->moveTo(rand1 * dotOverlay->getScreenWidth(), rand2 * dotOverlay->getScreenHeight());
         }
         int key = cv::waitKey(1) & 0xFF;
         if (key == 'q') { 
             break;
         }
-        {
-            // logic for getting mean of last 5 vals aain3l
-            if (key == 'c') { 
-                cout << "cut------------------------\n";
-                int sum = 0;
-                if (xVals.size() < 5) {
-                    cout << "cut too early, xVals did not hv 5+ elems\n";
-                    break;
-                }
-                for (int i = 0; i < 5; i ++) {
-                    int xVal = xVals[xVals.size() - i - 1];
-                    sum += xVal;
-                }
-                cout << "mean: " << sum / 5.0f << endl;
-                xVals.clear();
-            }
-        }
     }
+    delete dotOverlay;
 }
