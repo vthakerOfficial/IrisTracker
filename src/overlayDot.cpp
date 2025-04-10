@@ -21,6 +21,7 @@ DotOverlay::~DotOverlay() {
 void DotOverlay::runDotOverlay(int nCmdShow)
 {
     HINSTANCE hInstance = GetModuleHandle(NULL);
+
     m_threadMsg = std::thread([this, hInstance, nCmdShow]() {
         
         m_threadMsgID = GetCurrentThreadId();
@@ -66,6 +67,9 @@ void DotOverlay::runDotOverlay(int nCmdShow)
         ShowWindow(m_handleDotOverlay, nCmdShow);
         UpdateWindow(m_handleDotOverlay);
 
+        // allowing main thread to continue by setting bool to true
+        m_bInitialized.store(true, std::memory_order_release);
+
         MSG msg;
         while (!m_shouldClose.load() && GetMessage(&msg, NULL, 0, 0)) {
             TranslateMessage(&msg);
@@ -78,6 +82,11 @@ void DotOverlay::runDotOverlay(int nCmdShow)
         }
         UnregisterClass(m_CLASS_NAME, hInstance);
     });
+
+    // ensures dot window is initialized before continuing main thread
+    while (!m_bInitialized.load(std::memory_order_acquire)) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
 }
 
 

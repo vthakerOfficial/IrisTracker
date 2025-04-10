@@ -1,8 +1,10 @@
 #include <myTwoStepInferencer.h>
-#include <windows.h> // for overlay 
 #include <overlayDot.h>
+
+#include <windows.h> // for overlay 
 #include <thread>
 #include <chrono>
+
 
 using namespace std;
 
@@ -19,64 +21,72 @@ public:
         cv::Mat result = Inferencer::twoStepInference(frame, eyeInferencer, irisInferencer, &outDetections);
         cv::imshow("Result", result);
 
-        if (linearModel.empty() || dotOverlay == nullptr) return;
-
         float x = outDetections[0];
         float y = outDetections[1];
-        cout << "Iris xy: (" << x << ", " << y << ")\n";
+        cout << "Iris xy: (" << x << ", " << y << ")";
+
+        if (modelIrisScreen.empty() || dotOverlay == nullptr) {
+            cout << endl;
+            return;
+        }
+
+        vector<cv::Point2f> src, dst;
+        src.emplace_back(x, y);
+        cv::perspectiveTransform(src, dst, modelIrisScreen);
+        float predictedScreenX = dst[0].x;
+        float predictedScreenY = dst[0].y;
+
+        int w = dotOverlay->getScreenWidth();
+        int h = dotOverlay->getScreenHeight();
+        if (predictedScreenX < 0) {
+            predictedScreenX = 0;
+        } 
+        else if (predictedScreenX > w) {
+            predictedScreenX = w;
+        }
+        if (predictedScreenY < 0) {
+            predictedScreenY = 0;
+        } 
+        else if (predictedScreenY > h) {
+            predictedScreenY = h;
+        }
 
 
-        float hm = linearModel[0];
-        float hb = linearModel[1];
-        float vm = linearModel[2];
-        float vb = linearModel[3];
+        cout << "\tScreen xy: (" << predictedScreenX << ", " <<  predictedScreenY << ")\n";
 
-        // let coordX = y = mx + b
-        int finalX = hm * x + hb;
-        int finalY = vm * y + vb;
-        dotOverlay->moveTo(finalX, finalY);
+        dotOverlay->moveTo(predictedScreenX, predictedScreenY);
     }
 
-    void createLinearModel(DotOverlay* dotOverlay, int numPoints = 2) {
-        // lamba where x vals (inputs) are iris coords and y vals (outputs) are screen coords
-        auto updateVals = [this](Camera& cam, DotOverlay* dotOverlay, int& hx, int& vx, int hy, int vy) -> void {
-            dotOverlay->moveTo(hy, vy);
+    void calibrate(DotOverlay* dotOverlay) {
+        int w = dotOverlay->getScreenWidth();
+        int h = dotOverlay->getScreenHeight();
+        
+        vector<cv::Point2f> irisPts;
+        std::vector<cv::Point2f> screenPts {
+            { w / 10.0f, h / 10.0f },
+            { w * 9.0f / 10.0f, h / 10.0f },
+            { w / 10.0f, h * 9.0f / 10.0f },
+            { w * 9.0f / 10.0f, h * 9.0f / 10.0f },
+            { w / 2.0f , h / 2.0f }
+        };
+
+        for (cv::Point2f& pt : screenPts) {
+            dotOverlay->moveTo(pt.x, pt.y);
             this_thread::sleep_for(std::chrono::seconds(3));
             cv::Mat frame = cam.getFrame();
             array<float, 4> outDetections; // in format of [x1, y1, x2, y2...]
             cv::Mat result = Inferencer::twoStepInference(frame, eyeInferencer, irisInferencer, &outDetections);
-            hx = outDetections[0];
-            vx = outDetections[1];
-        };
-        
-        int w = dotOverlay->getScreenWidth();
-        int h = dotOverlay->getScreenHeight();
+            
+            float irisX = outDetections[0];
+            float irisY = outDetections[1];
 
-        // let y = screen coords 
-        // let x = iris coords
-        int hy1 = w / 3;
-        int vy1 = h / 3;
-        int hx1, vx1;
-        updateVals(cam, dotOverlay, hx1, vx1, hy1, vy1);
+            irisPts.emplace_back(irisX, irisY);
 
-        int hy2 = w * 2 / 3;
-        int vy2 = h * 2 / 3;
-        int hx2, vx2;
-        updateVals(cam, dotOverlay, hx2, vx2, hy2, vy2);
-
-
-        // calculating y = mx + b; 
-        // horizontal
-        float hm = static_cast<float>(hy2 - hy1) / static_cast<float>(hx2-hx1);
-        float hb = static_cast<float>(hy1) - static_cast<float>(hx1) * hm;
-
-        // vertical
-        float vm = static_cast<float>(vy2 - vy1) / static_cast<float>(vx2-vx1);
-        float vb = static_cast<float>(vy1) - static_cast<float>(vx1) * vm;
-
-        linearModel = { hm, hb, vm, vb};
-        cout << "Horizontal equation: \n\ty = " << hm << "x + " << hb << endl;
-        cout << "Vertical equation: \n\t y = " << vm << "x + " << vb << endl;
+            cout << "Calibration: Added coords iris(" << irisX << ", " << irisY
+            << ") & screen(" << pt.x << ", " << pt.y << ")\n"; 
+        }
+        modelIrisScreen = cv::findHomography(irisPts, screenPts, cv::RANSAC);
+        cout << "Success in creating model? " << !modelIrisScreen.empty() << endl;
     } 
 private:
     wstring m_eyePath = L"C:/V_Dev/irisTracker/models/eyeModel.onnx";
@@ -89,7 +99,8 @@ private:
 
     // in form of y = mx + b, first two values are m and b for horizontal
     // second 2 are for vertical
-    array<float, 4> linearModel; 
+    cv::Mat modelIrisScreen;
+
 
 };
 
@@ -103,14 +114,15 @@ int main() {
     
     DotOverlay* dotOverlay = new DotOverlay();
     dotOverlay->runDotOverlay();
-
+    
     cout << "Calibration has begun\n";
-    predicter.createLinearModel(dotOverlay);
+    predicter.calibrate(dotOverlay);
     cout << "Calibration has completed succesffully\n";
 
-    // fps
+    //fps
     auto t_start = chrono::high_resolution_clock::now();
     int frameCount = 0;
+    cout << "in while true loop\n";
     while (true) {
         predicter.run(dotOverlay);
 
@@ -123,15 +135,11 @@ int main() {
             frameCount = 0;
             t_start = t_now;
 
-            // random val
-            // float rand1 = rand() / (float)(RAND_MAX);
-            // float rand2 = rand() / (float)(RAND_MAX);
-            // dotOverlay->moveTo(rand1 * dotOverlay->getScreenWidth(), rand2 * dotOverlay->getScreenHeight());
         }
         int key = cv::waitKey(1) & 0xFF;
         if (key == 'q') { 
             break;
         }
     }
-    delete dotOverlay;
+
 }

@@ -10,8 +10,6 @@ set(OpenCV_BIN_DIR "C:/V_Dev/dependencies/opencv/build/x64/vc16/bin")
 # find OpenCV package
 find_package(OpenCV REQUIRED PATHS ${OpenCV_DIR})
 
-# include directories from OpenCV
-include_directories(${OpenCV_INCLUDE_DIR})
 
 # create executables
 set(SOURCES
@@ -21,9 +19,6 @@ set(SOURCES
     src/overlayDot.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
-
-# link OpenCV libraries
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 # copy opencv dlls to output directory
 add_custom_command(
@@ -44,11 +39,11 @@ set(ONNXRUNTIME_DIR "C:/V_Dev/dependencies/onnxruntime/onnxruntime-win-x64-gpu-1
 set(ONNXRUNTIME_INCLUDE_DIR "${ONNXRUNTIME_DIR}/include")
 set(ONNXRUNTIME_LIB_DIR "${ONNXRUNTIME_DIR}/lib")
 
-# include directories from ONNX Runtime
-include_directories(${ONNXRUNTIME_INCLUDE_DIR})
-
-# link ONNX Runtime libraries
-target_link_libraries(${PROJECT_NAME} "${ONNXRUNTIME_LIB_DIR}/onnxruntime.lib")
+# link ONNX Runtime & OpenCV libraries
+target_link_libraries(${PROJECT_NAME} 
+    ${OpenCV_LIBS}
+    "${ONNXRUNTIME_LIB_DIR}/onnxruntime.lib"
+)
 
 # copy ONNX Runtime dlls to output directory
 add_custom_command(
@@ -97,4 +92,10 @@ add_custom_command(
 
 
 # allowing my headers through this cmd
-include_directories(${CMAKE_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} PRIVATE
+    "${OpenCV_INCLUDE_DIR}"
+    "${ONNXRUNTIME_INCLUDE_DIR}"
+    "${CMAKE_SOURCE_DIR}/src" # any ofmy own dirs
+)
+
+# prev build timE = [driver] Build completed: 00:00:20.761

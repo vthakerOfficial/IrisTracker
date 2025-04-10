@@ -24,10 +24,11 @@ private:
 
 private:
     const TCHAR* m_CLASS_NAME = TEXT("DotOverlayClass");
-    static constexpr const int m_radius = 50;
+    static constexpr const int m_radius = 20;
     HWND m_handleDotOverlay = nullptr;
 
     std::thread m_threadMsg;
     DWORD m_threadMsgID = 0;
     std::atomic<bool> m_shouldClose { false };
+    std::atomic<bool> m_bInitialized { false };
 };

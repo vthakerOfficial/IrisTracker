@@ -6,7 +6,6 @@
 #include <array>
 #include <cstdlib> // used to exit
 #include <chrono> // time
-// #include <thread>
 #include <opencv2/opencv.hpp>
 #include <onnxruntime_cxx_api.h>
 
