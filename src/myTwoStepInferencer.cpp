@@ -116,7 +116,7 @@ cv::Mat Inferencer::operator()(const cv::Mat& frame) {
     }
     auto boxes = rmOverlappingBoxes(predictions);
     lastInferenceBoxes = boxes;
-    // 9) Draw final bounding boxes
+    // Draw final dot
     cv::Mat resultantFrame = frame.clone();
     for(auto &b : boxes){
         // Undo letterbox scaling/padding
@@ -125,12 +125,13 @@ cv::Mat Inferencer::operator()(const cv::Mat& frame) {
         float x2 = (b[2] - lastLB.left) / lastLB.scale;
         float y2 = (b[3] - lastLB.top)  / lastLB.scale;
 
-        cv::rectangle(
+        float midX = (x1+x2)/2.0f;
+        float midY = (y1+y2)/2.0f;
+        cv::circle(
             resultantFrame,
-            cv::Point((int)x1, (int)y1),
-            cv::Point((int)x2, (int)y2),
-            cv::Scalar(0, 255, 0),
-            2
+            cv::Point((int)midX, (int)midY),
+            1,
+            cv::Scalar(0,255,0)
         );
     }
     return resultantFrame;
@@ -247,9 +248,8 @@ cv::Mat Inferencer::twoStepInference(const cv::Mat& frame, Inferencer& modelA, I
                     (*outDetections)[outDetectionsIndex++] = (finalby1 + finalby2) / 2.0;
                 }
 
-                cv::rectangle(resultA, cv::Point(finalbx1, finalby1), cv::Point(finalbx2, finalby2), cv::Scalar(0, 255, 255), 4);
+                cv::rectangle(resultA, cv::Point(finalbx1, finalby1), cv::Point(finalbx2, finalby2), cv::Scalar(0, 255, 255), 2);
             }
         }
         return resultA;
     }
-
