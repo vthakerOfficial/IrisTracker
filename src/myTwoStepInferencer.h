@@ -33,7 +33,7 @@ public:
         int left;
         float scale;
     };
-    static cv::Mat Inferencer::twoStepInference(const cv::Mat& frame, Inferencer& modelA, Inferencer& modelB, std::array<float, 4>* outDetections = nullptr);
+    static cv::Mat twoStepInference(const cv::Mat& frame, Inferencer& modelA, Inferencer& modelB, std::array<float, 4>* outDetections = nullptr);
 private:
     LetterboxResult letterbox(const cv::Mat& img);
     std::vector<std::array<float,6>> rmOverlappingBoxes(const std::vector<std::array<float,6>>& boxes, float inferenceThres = .3f);

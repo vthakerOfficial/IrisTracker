@@ -1,9 +1,10 @@
-#include <myTwoStepInferencer.h>
-#include <overlayDot.h>
+#include "myTwoStepInferencer.h"
+#include "overlayDot.h"
 
 #include <windows.h> // for overlay 
 #include <thread>
 #include <chrono>
+#include "pythonBridge.h"
 
 
 using namespace std;
@@ -175,9 +176,10 @@ private:
 
 int main() {
     Camera cam;
+    PythonBridge pyBridge("../../src/PythonHelper/face_model_server.py");
     PredictLook predicter(cam);
 
-    bool bCalibrate = true;
+    bool bCalibrate = false;
     DotOverlay* dotOverlay = nullptr;
     if (bCalibrate) {
         dotOverlay = new DotOverlay();
@@ -189,8 +191,12 @@ int main() {
     }
 
     while (true) {
-        predicter.run(dotOverlay);
-
+        std::vector<cv::Point2f> landmarks;
+        if(!pyBridge.read(landmarks)) {
+            continue;
+        }
+        std::cout << "Landmarks: " << landmarks[0].x << ", " << landmarks[0].y << "\n";
+        // predicter.run(dotOverlay);
         int key = cv::waitKey(1) & 0xFF;
         if (key == 'q') { 
             break;

@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.28)
 project(IrisTracker)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # set OpenCV directory paths
 set(OpenCV_DIR "C:/V_Dev/dependencies/opencv/build")
 set(OpenCV_INCLUDE_DIR "C:/V_Dev/dependencies/opencv/build/include")
@@ -15,7 +18,6 @@ find_package(OpenCV REQUIRED PATHS ${OpenCV_DIR})
 set(SOURCES
     src/main.cpp
     src/myTwoStepInferencer.cpp
-    src/mouseMover.cpp
     src/overlayDot.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
