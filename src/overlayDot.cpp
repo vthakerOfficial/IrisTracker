@@ -1,4 +1,6 @@
 #include <overlayDot.h>
+#include <iostream>
+
 
 DotOverlay::DotOverlay() 
 : 
@@ -18,7 +20,7 @@ DotOverlay::~DotOverlay() {
     std::cout << "Destroyed dot overlay\n";
 }
 
-void DotOverlay::runDotOverlay(int nCmdShow)
+void DotOverlay::run(int nCmdShow)
 {
     HINSTANCE hInstance = GetModuleHandle(NULL);
 

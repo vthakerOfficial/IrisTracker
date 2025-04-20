@@ -1,3 +1,5 @@
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 cmake_minimum_required(VERSION 3.28)
 project(IrisTracker)
 
@@ -17,8 +19,8 @@ find_package(OpenCV REQUIRED PATHS ${OpenCV_DIR})
 # create executables
 set(SOURCES
     src/main.cpp
-    src/myTwoStepInferencer.cpp
     src/overlayDot.cpp
+    src/camera.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 

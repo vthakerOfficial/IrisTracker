@@ -1,13 +1,19 @@
-#include "myTwoStepInferencer.h"
 #include "overlayDot.h"
 
 #include <windows.h> // for overlay 
 #include <thread>
 #include <chrono>
 #include "pythonBridge.h"
+#include "Camera.h"
 
+#include <opencv2/opencv.hpp>
+#include <iostream>
+#include <array>
+#include <vector>
 
 using namespace std;
+
+
 
 
 class PredictLook {
@@ -18,42 +24,26 @@ public:
     };
 public:
     PredictLook(Camera& cam) 
-        : eyeInferencer(m_eyePath), irisInferencer(m_irisPath), cam(cam)
+        : cam(cam), pyBridge("../../src/PythonHelper/face_model_server.py")
     {}
-    void run(DotOverlay* dotOverlay = nullptr) {
+    bool run(DotOverlay* dotOverlay = nullptr) {
+        array<cv::Point2f, 2> outDetections;
+        if (!runPyModel(outDetections)) {
+            return false;
+        }
+        cv::Point2f leftEye = outDetections[0];
+        cv::Point2f rightEye = outDetections[1]; 
+        cout << "Left Eye: (" << leftEye.x << ", " << leftEye.y << ")\tRight Eye: (" << rightEye.x << ", " << rightEye.y << ")\n";
         cv::Mat frame = cam.getFrame();
-        if (frame.empty()) {
-            cout << "Camera inaccessible\n";
-            exit(EXIT_FAILURE);
-        }
+        cv::circle(frame, leftEye, 5, cv::Scalar(0, 255, 0), -1);
+        cv::circle(frame, rightEye, 5, cv::Scalar(0, 255, 0), -1);
+        cv::imshow("Iris Detection", frame);
+        
+        
+        if (!dotOverlay) return true;
 
-        array<float, 4> outDetections; // in format of [x1, y1, x2, y2...]
-        cv::Mat result = Inferencer::twoStepInference(frame, eyeInferencer, irisInferencer, &outDetections);
-        cv::imshow("Result", result);
-
-        if (!dotOverlay) return;
-
-
-        bool bBothEyesDetected = true;
-        for (int i = 0; i < outDetections.size(); i++) {
-            if (outDetections[i] < 0) {
-                bBothEyesDetected = false;
-                break;
-            }
-        }
-        if (!bBothEyesDetected) return;
-
-
-
-        vector<cv::Point2f> srcLeft, srcRight;
-        if (outDetections[0] < outDetections[2]) {
-            srcLeft.emplace_back(outDetections[0], outDetections[1]);
-            srcRight.emplace_back(outDetections[2], outDetections[3]);
-        } else {
-            srcLeft.emplace_back(outDetections[2], outDetections[3]);
-            srcRight.emplace_back(outDetections[0], outDetections[1]);
-
-        }
+        vector<cv::Point2f> srcLeft{ leftEye };
+        vector<cv::Point2f> srcRight{ rightEye };
 
         vector<cv::Point2f> dstLeft, dstRight;
         cv::perspectiveTransform(srcLeft, dstLeft, calibH.eyeLeft);
@@ -62,10 +52,10 @@ public:
         cv::Point2f avg( (dstLeft[0].x + dstRight[0].x) / 2.0f, (dstLeft[0].y + dstRight[0].y) / 2.0f );
 
         dotOverlay->moveTo(avg.x, avg.y);
-
-        cout << "Predicted Coord acc 2 Eye Left(" << dstLeft[0].x << ", " << dstLeft[0].y 
-        << "), Right(" << dstRight[0].x << ", " << dstRight[0].y << "), Avg: "
-        << avg.x << ", " << avg.y << ")\n";
+        return true;
+        // cout << "Predicted Coord acc 2 Eye Left(" << dstLeft[0].x << ", " << dstLeft[0].y 
+        // << "), Right(" << dstRight[0].x << ", " << dstRight[0].y << "), Avg: "
+        // << avg.x << ", " << avg.y << ")\n";
     }
 
     void calibrate(DotOverlay* dotOverlay) {
@@ -84,19 +74,6 @@ public:
             { w * .9f, h * .9f}
         };
 
-        // adding this for visualization purposes
-        // {
-        //     cv::Mat frame = cam.getFrame();
-        //     if (frame.empty()) {
-        //         cout << "Camera inaccessible\n";
-        //         exit(EXIT_FAILURE);
-        //     }
-        //     array<float,4> outDetections;
-        //     cv::Mat result = Inferencer::twoStepInference(frame, eyeInferencer, irisInferencer, &outDetections);
-        //     cv::imshow("Result", result);
-        // }
-        //
-
         vector<cv::Point2f> irisPtsLeft;
         vector<cv::Point2f> irisPtsRight;
 
@@ -106,84 +83,85 @@ public:
             this_thread::sleep_for(std::chrono::seconds(1));
             
             const int numSamples = 5;
-            float sumXLeft = 0;
-            float sumYLeft = 0;
-
-            float sumXRight = 0;
-            float sumYRight = 0;
+            cv::Point2f sumLeft(0, 0);
+            cv::Point2f sumRight(0, 0);
 
             for (int i = 0; i < numSamples; i++) {
-                cv::Mat frame = cam.getFrame();
-                array<float, 4> outDetections; // in format of [x1, y1, x2, y2...]
-                cv::Mat result = Inferencer::twoStepInference(frame, eyeInferencer, irisInferencer, &outDetections);
-                bool bSuccess = true;
-                for (int j = 0; j < outDetections.size(); j++) {
-                    if (outDetections[j] < 0) {
-                        bSuccess = false;
-                        break;
-                    }
-                }
+                array<cv::Point2f, 2> outDetections;
+                bool bSuccess = runPyModel(outDetections);
                 if (bSuccess) {
-                    if (outDetections[0] < outDetections[2]) {
-                        sumXLeft += outDetections[0];
-                        sumYLeft += outDetections[1];
-                        sumXRight += outDetections[2];
-                        sumYRight += outDetections[3];
-                    } else {
-                        sumXLeft += outDetections[2];
-                        sumYLeft += outDetections[3];
-                        sumXRight += outDetections[0];
-                        sumYRight += outDetections[1];
-                    }
+                    sumLeft += outDetections[0];
+                    sumRight += outDetections[1];
                 } else {
                     cout << "Failed calibration. No iris detected\n";
                     exit(EXIT_FAILURE);
                 }
                 this_thread::sleep_for(chrono::milliseconds(50));
             }
-            float avgXLeft = sumXLeft / numSamples;
-            float avgYLeft = sumYLeft / numSamples;
-            float avgXRight = sumXRight / numSamples;
-            float avgYRight = sumYRight / numSamples;
+            cv::Point2f avgLeft = sumLeft / numSamples;
+            cv::Point2f avgRight = sumRight / numSamples;
+            
 
-            irisPtsLeft.emplace_back(avgXLeft, avgYLeft);
-            irisPtsRight.emplace_back(avgXRight, avgYRight);
+            irisPtsLeft.push_back(avgLeft);
+            irisPtsRight.push_back(avgRight);
 
-            cout << "Calibration: At screen(" << pt.x << ", " << pt.y << "),\tIris Avg Left(" << avgXLeft << ", " << avgYLeft <<
-            ")  Right(" << avgXRight << ", " << avgYRight << ")\n";
+            cout << "Calibration: At screen(" << pt.x << ", " << pt.y << "),\tIris Avg Left(" << avgLeft.x << ", " << avgLeft.y <<
+            ")  Right(" << avgRight.x << ", " << avgRight.y << ")\n";
         }
         
         calibH.eyeLeft = cv::findHomography(irisPtsLeft, screenPts, cv::RANSAC);
         calibH.eyeRight = cv::findHomography(irisPtsRight, screenPts, cv::RANSAC);
 
         if (calibH.eyeLeft.empty() || calibH.eyeRight.empty()) {
-            cout << "Failed Homography during calibration\n";
+            cout << "[Calibration] failed homography\n";
             exit(EXIT_FAILURE);
         }
     } 
 private:
-    wstring m_eyePath = L"C:/V_Dev/irisTracker/models/eyeModel.onnx";
-    wstring m_irisPath = L"C:/V_Dev/irisTracker/models/irisModel.onnx";
+    bool runPyModel(array<cv::Point2f, 2>& outDetections) {
+        cv::Mat frame = cam.getFrame();
+        if (frame.empty()) {
+            cout << "[runPyModel] cam frame was empty\n";
+            return false;
+        }
 
+        pyBridge.sendFrame(frame);
+        std::vector<cv::Point2f> landmarks;
+        if(!pyBridge.read(landmarks)) {
+            return false;
+        }
+
+        auto mean5Pts = [&](int start) {
+            cv::Point2f sum(0, 0);
+            for (int i = 0; i < 5; i++) {
+                sum+=landmarks[start + i];
+            }
+            return sum / 5.0f;
+        };
+
+        cv::Point2f leftEye = mean5Pts(468); // last 10 points contain iris results (so 5 for left, 5 for right)
+        cv::Point2f rightEye = mean5Pts(473); 
+        outDetections[0] = leftEye;
+        outDetections[1] = rightEye;
+        cout << "Left Eye: (" << leftEye.x << ", " << leftEye.y << ")\tRight Eye: (" << rightEye.x << ", " << rightEye.y << ")\n";
+        return true;
+    }
+private:
     Camera cam;
-
-    Inferencer eyeInferencer;
-    Inferencer irisInferencer;
-
     CalibrationHomographies calibH;
+
+    PythonBridge pyBridge;
 };
 
-
 int main() {
-    Camera cam;
-    PythonBridge pyBridge("../../src/PythonHelper/face_model_server.py");
+    Camera cam(0);
     PredictLook predicter(cam);
 
     bool bCalibrate = false;
     DotOverlay* dotOverlay = nullptr;
     if (bCalibrate) {
         dotOverlay = new DotOverlay();
-        dotOverlay->runDotOverlay();
+        dotOverlay->run();
 
         predicter.calibrate(dotOverlay);
 
@@ -191,12 +169,8 @@ int main() {
     }
 
     while (true) {
-        std::vector<cv::Point2f> landmarks;
-        if(!pyBridge.read(landmarks)) {
-            continue;
-        }
-        std::cout << "Landmarks: " << landmarks[0].x << ", " << landmarks[0].y << "\n";
-        // predicter.run(dotOverlay);
+        predicter.run(dotOverlay);
+       
         int key = cv::waitKey(1) & 0xFF;
         if (key == 'q') { 
             break;

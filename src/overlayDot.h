@@ -2,7 +2,6 @@
 
 #include <windows.h>
 #include <dwmapi.h>
-#include <iostream>
 #include <thread>
 #include <atomic>
 
@@ -18,7 +17,7 @@ public:
     
     void moveTo(int x, int y);
         
-    void runDotOverlay(int nCmdShow = SW_SHOW);
+    void run(int nCmdShow = SW_SHOW);
 private:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 

@@ -51,6 +51,27 @@ public:
         }
         return out.size() == 478; // 478 is expected output size
     }
+    bool sendFrame(const cv::Mat& frame) {
+        if (!m_pipe) {
+            return false;
+        }
+
+        std::vector<uchar> buffer;
+
+        bool bSuccess = cv::imencode(".jpg", frame, buffer);
+        if (!bSuccess) {
+            return false;
+        }
+
+        int len = buffer.size();
+        
+        fwrite(&len, sizeof(len), 1, m_pipe);
+        fwrite(buffer.data(), 1, len, m_pipe);
+
+        fflush(m_pipe);
+
+        return true;
+    }
 private:
     FILE* m_pipe = nullptr;
 };
