@@ -5,13 +5,14 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/V_Dev/dependencies/opencv/build/include",
-                "C:/V_Dev/dependencies/onnxruntime/onnxruntime-win-x64-gpu-1.21.0/include"
+                "${workspaceFolder}/venv/Lib/site-packages/pybind11/include"
             ],
             "browse": {
                 "path": [
                     "$(workspaceFolder)",
                     "C:/V_Dev/dependencies/opencv/build/include",
-                    "C:/V_Dev/dependencies/onnxruntime/onnxruntime-win-x64-gpu-1.21.0/include"
+                    "${workspaceFolder}/venv/Lib/site-packages/pybind11/include",
+                    "C:/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0/Include"
                 ],
                 "limitSymbolsToIncludedHeaders": false
             },
@@ -23,7 +24,7 @@
             "windowsSdkVersion": "10.0.22621.0",
             "compilerPath": "cl.exe",
             "cStandard": "c17",
-            "cppStandard": "c++17",
+            "cppStandard": "c++20",
             "intelliSenseMode": "windows-msvc-x64"
         }
     ],

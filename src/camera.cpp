@@ -17,7 +17,7 @@ cv::Mat Camera::getFrame() {
     m_cam >> frame;
 
     if (frame.empty()) {
-        std::cerr << "[Camera] ERROR captured an empty frame\n";
+        std::cerr << "[Camera] WARNING captured an empty frame\n";
         return frame;
     }
 
@@ -26,6 +26,6 @@ cv::Mat Camera::getFrame() {
         
 Camera::~Camera() {
     m_cam.release();
-    std::cout << "Camera Stopped\n";
+    std::cout << "[Camera] Terminated\n";
 }
     

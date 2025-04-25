@@ -1,5 +1,6 @@
 # custom ignore rules
 /build/
+src/venv/
 
 # Prerequisites
 *.d

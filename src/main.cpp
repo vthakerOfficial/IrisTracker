@@ -1,6 +1,7 @@
-#include "overlayDot.h"
-
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h> // for overlay 
+#include "overlayDot.h"
 #include <thread>
 #include <chrono>
 #include "pythonBridge.h"
@@ -24,13 +25,15 @@ public:
     };
 public:
     PredictLook(Camera& cam) 
-        : cam(cam), pyBridge("../../src/PythonHelper/face_model_server.py")
+        : cam(cam), pyBridge()
     {}
     bool run(DotOverlay* dotOverlay = nullptr) {
         array<cv::Point2f, 2> outDetections;
         if (!runPyModel(outDetections)) {
             return false;
         }
+
+        
         cv::Point2f leftEye = outDetections[0];
         cv::Point2f rightEye = outDetections[1]; 
         cout << "Left Eye: (" << leftEye.x << ", " << leftEye.y << ")\tRight Eye: (" << rightEye.x << ", " << rightEye.y << ")\n";
@@ -125,9 +128,10 @@ private:
             return false;
         }
 
-        pyBridge.sendFrame(frame);
-        std::vector<cv::Point2f> landmarks;
-        if(!pyBridge.read(landmarks)) {
+        ;
+        std::vector<cv::Point2f> landmarks = pyBridge.runModelOn(frame);
+        if(landmarks.size() != 478) {
+            cout << "Landmarks size was not 478, instead got << " << landmarks.size() << "\n";
             return false;
         }
 
